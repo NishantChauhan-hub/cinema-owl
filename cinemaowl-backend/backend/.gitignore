@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit real secrets)
+.env
+.env.local
+
+# Database file (runtime data — not source code)
+db/cinemaowl.json
+
+# Logs
+*.log

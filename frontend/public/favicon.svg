@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Rounded background with gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a2e"/>
+      <stop offset="100%" style="stop-color:#0a1628"/>
+    </linearGradient>
+    <radialGradient id="eyeL" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00EEFF"/>
+      <stop offset="100%" style="stop-color:#00A8CC"/>
+    </radialGradient>
+    <radialGradient id="eyeR" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#A855F7"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </radialGradient>
+    <filter id="glow-c">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-v">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background pill -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+
+  <!-- Subtle border -->
+  <rect width="64" height="64" rx="14" fill="none" stroke="#7C3AED" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Ear tufts -->
+  <polygon points="17,20 13,10 22,17" fill="#7C3AED" opacity="0.9"/>
+  <polygon points="47,20 42,17 51,10" fill="#00D4FF" opacity="0.9"/>
+
+  <!-- Owl body -->
+  <ellipse cx="32" cy="42" rx="16" ry="12" fill="#1a0a2e" stroke="#7C3AED" stroke-width="1" opacity="0.8"/>
+
+  <!-- Wing feather lines -->
+  <path d="M18 44 Q14 40 16 36" stroke="#7C3AED" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M46 44 Q50 40 48 36" stroke="#00D4FF" stroke-width="1" fill="none" opacity="0.6"/>
+
+  <!-- Left eye socket -->
+  <circle cx="22" cy="28" r="10" fill="#0d0820" stroke="#00D4FF" stroke-width="1.5"/>
+  <!-- Right eye socket -->
+  <circle cx="42" cy="28" r="10" fill="#0d0820" stroke="#A855F7" stroke-width="1.5"/>
+
+  <!-- Left eye glow -->
+  <circle cx="22" cy="28" r="6.5" fill="url(#eyeL)" filter="url(#glow-c)"/>
+  <!-- Right eye glow -->
+  <circle cx="42" cy="28" r="6.5" fill="url(#eyeR)" filter="url(#glow-v)"/>
+
+  <!-- Eye pupils -->
+  <circle cx="22" cy="28" r="3" fill="#001a22"/>
+  <circle cx="42" cy="28" r="3" fill="#1a0030"/>
+
+  <!-- Eye shine -->
+  <circle cx="24" cy="25.5" r="1.8" fill="white" opacity="0.85"/>
+  <circle cx="44" cy="25.5" r="1.8" fill="white" opacity="0.85"/>
+
+  <!-- Beak -->
+  <polygon points="32,33 28.5,38 35.5,38" fill="#F59E0B"/>
+  <line x1="32" y1="33" x2="32" y2="38" stroke="#D97706" stroke-width="0.8"/>
+
+  <!-- Feet / talons -->
+  <line x1="26" y1="53" x2="24" y2="57" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="26" y1="53" x2="26" y2="58" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="26" y1="53" x2="28" y2="57" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="38" y1="53" x2="36" y2="57" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="38" y1="53" x2="38" y2="58" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="38" y1="53" x2="40" y2="57" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
