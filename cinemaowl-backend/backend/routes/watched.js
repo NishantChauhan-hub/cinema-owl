@@ -1,5 +1,5 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require("axios");
 const { addWatched, removeWatched, getWatched } = require("../db/database");
 
 const router = express.Router();
@@ -45,6 +45,42 @@ router.delete("/", (req, res) => {
   }
 });
 
+// Fallback models to try in case of quota or 404 errors
+const MODEL_CANDIDATES = [
+  { api: "v1beta", model: "gemini-2.5-flash" },
+  { api: "v1beta", model: "gemini-2.0-flash" },
+  { api: "v1beta", model: "gemini-2.0-flash-001" },
+  { api: "v1beta", model: "gemini-flash-latest" },
+  { api: "v1beta", model: "gemini-2.0-flash-lite" },
+  { api: "v1beta", model: "gemini-flash-lite-latest" },
+];
+
+async function callGemini(prompt) {
+  const key = process.env.GEMINI_API_KEY;
+  let lastErr;
+
+  for (const { api, model } of MODEL_CANDIDATES) {
+    const url = `https://generativelanguage.googleapis.com/${api}/models/${model}:generateContent?key=${key}`;
+    try {
+      const { data } = await axios.post(url, {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 800, temperature: 0.85 },
+      }, { timeout: 20000 });
+
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (text) {
+        return text;
+      }
+    } catch (err) {
+      const status = err.response?.status;
+      const msg = err.response?.data?.error?.message || err.message;
+      lastErr = new Error(`${model}: ${msg}`);
+      if (status === 400 || status === 403) break;
+    }
+  }
+  throw lastErr || new Error("All Gemini models unavailable");
+}
+
 // ─── POST /api/watched/:sessionId/season-news ──────────────────────────────────
 // AI agent checks upcoming season news for shows/anime sent from the frontend
 router.post("/:sessionId/season-news", async (req, res) => {
@@ -57,9 +93,6 @@ router.post("/:sessionId/season-news", async (req, res) => {
         message: "No shows or anime in your watched list yet — add some series to track upcoming seasons!",
       });
     }
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const titleList = seriesList.map((t) => `- ${t.title_name} (${t.title_type})`).join("\n");
 
@@ -90,8 +123,7 @@ Respond in JSON format like this:
   "summary": "One overall summary sentence about the batch"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const text = await callGemini(prompt);
 
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
