@@ -219,6 +219,12 @@ html, body, #root {
 .msg-row    { display: flex; align-items: flex-end; gap: 8px; }
 .msg-row-u  { flex-direction: row-reverse; }
 .msg-owl    { background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.18); color: var(--text); padding: 10px 14px; border-radius: 14px 14px 14px 3px; font-size: 13px; line-height: 1.55; max-width: 80%; }
+.msg-owl p  { margin-bottom: 8px; }
+.msg-owl p:last-child { margin-bottom: 0; }
+.msg-owl ul, .msg-owl ol { margin-left: 18px; margin-bottom: 8px; }
+.msg-owl li { margin-bottom: 4px; }
+.msg-owl strong { color: var(--cyan); }
+
 .msg-user   { background: linear-gradient(120deg, var(--violet), var(--magenta)); color: #fff; padding: 10px 14px; border-radius: 14px 14px 3px 14px; font-size: 13px; line-height: 1.55; max-width: 80%; }
 .u-av       { width: 24px; height: 24px; border-radius: 99px; background: var(--panel); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 

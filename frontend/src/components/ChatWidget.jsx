@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bot, X, Send, User } from "lucide-react";
 import { apiFetch, SESSION_ID } from "../utils";
+import ReactMarkdown from "react-markdown";
 
 const QUICK_ACTIONS = [
   "Recommend something 🎬",
@@ -125,7 +126,9 @@ export default function ChatWidget({ open, setOpen, pendingPrompt, setPendingPro
             {messages.map((m, i) => (
               <div key={i} className={`msg-row ${m.role === "user" ? "msg-row-u" : ""}`}>
                 {m.role === "owl" && <div className="chat-av chat-av-sm"><Bot size={12} color="#030308" /></div>}
-                <div className={m.role === "user" ? "msg-user" : "msg-owl"}>{m.text}</div>
+                <div className={m.role === "user" ? "msg-user" : "msg-owl"}>
+                  {m.role === "owl" ? <ReactMarkdown>{m.text}</ReactMarkdown> : m.text}
+                </div>
                 {m.role === "user" && <div className="u-av"><User size={11} color="var(--text-muted)" /></div>}
               </div>
             ))}
