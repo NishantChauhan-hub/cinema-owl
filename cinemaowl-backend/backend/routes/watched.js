@@ -64,7 +64,7 @@ async function callGemini(prompt) {
     try {
       const { data } = await axios.post(url, {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 800, temperature: 0.85 },
+        generationConfig: { maxOutputTokens: 4000, temperature: 0.85 },
       }, { timeout: 20000 });
 
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
