@@ -79,7 +79,7 @@ export default function WatchedPage({ listData, onToggleList, onOpen }) {
     setNewsLoading(true);
     setNews(null);
     setNewsError(null);
-    const data = await apiFetch(`/watched/${SESSION_ID}/season-news`, {
+    const data = await apiFetch(`/watched/season-news`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ shows }),

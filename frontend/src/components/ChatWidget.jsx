@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Bot, X, Send, User } from "lucide-react";
-import { apiFetch, SESSION_ID } from "../utils";
+import { apiFetch } from "../utils";
 import ReactMarkdown from "react-markdown";
+import { AuthContext } from "../context/AuthContext";
 
 const QUICK_ACTIONS = [
   "Recommend something 🎬",
@@ -17,12 +18,23 @@ const QUICK_ACTIONS = [
  *  - pendingPrompt       — a pre-filled message to send on open (e.g. from Detail page)
  *  - setPendingPrompt    — clears the pending prompt after it's sent
  */
-export default function ChatWidget({ open, setOpen, pendingPrompt, setPendingPrompt }) {
+export default function ChatWidget({ open, setOpen, pendingPrompt, setPendingPrompt, listData }) {
   const [messages, setMessages]   = useState([]);
   const [input, setInput]         = useState("");
   const [thinking, setThinking]   = useState(false);
   const endRef   = useRef(null);
   const inputRef = useRef(null);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user && open && messages.length === 0) {
+      apiFetch("/chat/history").then(data => {
+        if (data?.history) {
+          setMessages(data.history);
+        }
+      });
+    }
+  }, [user, open]);
 
   // Scroll to latest message
   useEffect(() => {
@@ -54,7 +66,7 @@ export default function ChatWidget({ open, setOpen, pendingPrompt, setPendingPro
     const data = await apiFetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: SESSION_ID, message: msg }),
+      body: JSON.stringify({ message: msg, watched: listData || [] }),
     });
 
     const reply = data?.reply || (data?.detail ? `Error: ${data.detail}` : "Owl's having a moment 🦉 — try again shortly.");
@@ -159,7 +171,7 @@ export default function ChatWidget({ open, setOpen, pendingPrompt, setPendingPro
             <button className="send-btn" onClick={() => sendMsg()}><Send size={14} /></button>
           </div>
           <div style={{ textAlign: "center", fontSize: 10, color: "var(--text-dim)", paddingBottom: 7, fontFamily: "var(--font-mono)" }}>
-            session · {SESSION_ID.slice(4, 11)}
+            {user ? `logged in as ${user.email}` : "anonymous session"}
           </div>
         </div>
       )}

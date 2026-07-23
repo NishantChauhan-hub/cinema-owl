@@ -1,6 +1,8 @@
 const express = require("express");
 const axios = require("axios");
-const { saveMessage, getHistory, getWatched } = require("../db/database");
+const { optionalAuth, authMiddleware } = require("../middleware/auth");
+const ChatMessage = require("../models/ChatMessage");
+const WatchedItem = require("../models/WatchedItem");
 
 const router = express.Router();
 
@@ -58,25 +60,34 @@ async function callGemini(prompt) {
   throw lastErr || new Error("All Gemini models unavailable");
 }
 
-router.post("/", async (req, res) => {
-  const { sessionId, message, context } = req.body;
-  if (!sessionId || !message) {
-    return res.status(400).json({ error: "sessionId and message required" });
+router.post("/", optionalAuth, async (req, res) => {
+  const { message, context, watched: clientWatched } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: "message required" });
   }
 
   try {
-    saveMessage(sessionId, "user", message, context?.id || null);
+    let recentHistory = [];
+    let watchedList = clientWatched || [];
 
-    const history = getHistory(sessionId, 16);
-    const recentHistory = history.slice(0, -1);
+    // If logged in, fetch history and watched list, and save user message
+    if (req.user) {
+      const dbHistory = await ChatMessage.find({ userId: req.user.userId }).sort({ createdAt: 1 }).limit(16);
+      recentHistory = dbHistory.map(m => ({ role: m.role, content: m.text }));
+      
+      const dbWatched = await WatchedItem.find({ userId: req.user.userId });
+      watchedList = dbWatched.map(w => ({ title_name: w.title_name, title_type: w.title_type }));
+      
+      await new ChatMessage({ userId: req.user.userId, role: "user", text: message }).save();
+    }
+
     const convText = recentHistory.length > 0
       ? "\n\nConversation so far:\n" +
         recentHistory.map(m => (m.role === "owl" ? "Owl" : "User") + ": " + m.content).join("\n")
       : "";
 
-    const watched = getWatched(sessionId);
-    const watchedCtx = watched.length > 0
-      ? "\n\nUser's saved list: " + watched.map(w => w.title_name + " (" + w.title_type + ")").join(", ") + "."
+    const watchedCtx = watchedList.length > 0
+      ? "\n\nUser's saved list: " + watchedList.map(w => w.title_name + " (" + w.title_type + ")").join(", ") + "."
       : "";
 
     const detailCtx = context
@@ -86,7 +97,11 @@ router.post("/", async (req, res) => {
     const fullPrompt = SYSTEM_PROMPT + watchedCtx + convText + detailCtx + "\n\nUser: " + message + "\nOwl:";
 
     const reply = await callGemini(fullPrompt);
-    saveMessage(sessionId, "owl", reply, context?.id || null);
+
+    if (req.user) {
+      await new ChatMessage({ userId: req.user.userId, role: "owl", text: reply }).save();
+    }
+    
     res.json({ reply });
 
   } catch (err) {
@@ -95,8 +110,14 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:sessionId", (req, res) => {
-  res.json({ history: getHistory(req.params.sessionId, 200) });
+router.get("/history", authMiddleware, async (req, res) => {
+  try {
+    const dbHistory = await ChatMessage.find({ userId: req.user.userId }).sort({ createdAt: 1 }).limit(200);
+    const history = dbHistory.map(m => ({ role: m.role, text: m.text }));
+    res.json({ history });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch history" });
+  }
 });
 
 module.exports = router;

@@ -13,20 +13,28 @@ export const SESSION_ID = (() => {
 
 // ── API helper ────────────────────────────────────────────────────────────────
 // Wraps fetch with error handling. Returns null on any failure.
-export async function apiFetch(path, opts = {}) {
+export async function apiFetch(endpoint, options = {}) {
+  const url = `${API}${endpoint}`;
+  
+  const token = localStorage.getItem("cinemaowl_token");
+  const headers = {
+    ...options.headers,
+  };
+  
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   try {
-    const res = await fetch(`${API}${path}`, opts);
+    const res = await fetch(url, { ...options, headers });
     if (!res.ok) {
-      try {
-        const errBody = await res.json();
-        return errBody || { error: `HTTP Error: ${res.status}` };
-      } catch {
-        return { error: `HTTP Error: ${res.status}` };
-      }
+      const err = await res.json().catch(() => ({}));
+      return { error: err.error || err.detail || `HTTP Error ${res.status}` };
     }
-    return res.json();
+    return await res.json();
   } catch (err) {
-    return { error: err.message };
+    console.error("API Error:", err);
+    return { error: "Network Error. Is the backend running?" };
   }
 }
 

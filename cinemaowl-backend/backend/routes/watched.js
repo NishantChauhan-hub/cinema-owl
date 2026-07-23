@@ -1,13 +1,14 @@
 const express = require("express");
 const axios = require("axios");
-const { addWatched, removeWatched, getWatched } = require("../db/database");
+const { authMiddleware } = require("../middleware/auth");
+const WatchedItem = require("../models/WatchedItem");
 
 const router = express.Router();
 
-// ─── GET /api/watched/:sessionId ──────────────────────────────────────────────
-router.get("/:sessionId", (req, res) => {
+// ─── GET /api/watched ────────────────────────────────────────────────────────
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const list = getWatched(req.params.sessionId);
+    const list = await WatchedItem.find({ userId: req.user.userId }).sort({ addedAt: -1 });
     res.json({ watched: list });
   } catch (err) {
     console.error(err);
@@ -16,28 +17,37 @@ router.get("/:sessionId", (req, res) => {
 });
 
 // ─── POST /api/watched ────────────────────────────────────────────────────────
-router.post("/", (req, res) => {
-  const { sessionId, titleId, titleType, titleName, posterUrl, tmdbId } = req.body;
-  if (!sessionId || !titleId || !titleName) {
-    return res.status(400).json({ error: "sessionId, titleId, titleName required" });
+router.post("/", authMiddleware, async (req, res) => {
+  const { titleId, titleType, titleName, posterUrl, tmdbId } = req.body;
+  if (!titleId || !titleName) {
+    return res.status(400).json({ error: "titleId and titleName required" });
   }
   try {
-    addWatched(sessionId, titleId, titleType || "movie", titleName, posterUrl, tmdbId);
+    const item = new WatchedItem({
+      userId: req.user.userId,
+      title_id: titleId,
+      title_type: titleType || "movie",
+      title_name: titleName,
+      poster_url: posterUrl,
+      tmdb_id: tmdbId
+    });
+    await item.save();
     res.json({ ok: true });
   } catch (err) {
+    if (err.code === 11000) return res.json({ ok: true }); // Already in list
     console.error(err);
     res.status(500).json({ error: "Failed to add to watched list" });
   }
 });
 
 // ─── DELETE /api/watched ──────────────────────────────────────────────────────
-router.delete("/", (req, res) => {
-  const { sessionId, titleId } = req.body;
-  if (!sessionId || !titleId) {
-    return res.status(400).json({ error: "sessionId and titleId required" });
+router.delete("/", authMiddleware, async (req, res) => {
+  const { titleId } = req.body;
+  if (!titleId) {
+    return res.status(400).json({ error: "titleId required" });
   }
   try {
-    removeWatched(sessionId, titleId);
+    await WatchedItem.findOneAndDelete({ userId: req.user.userId, title_id: titleId });
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -81,9 +91,9 @@ async function callGemini(prompt) {
   throw lastErr || new Error("All Gemini models unavailable");
 }
 
-// ─── POST /api/watched/:sessionId/season-news ──────────────────────────────────
+// ─── POST /api/watched/season-news ──────────────────────────────────
 // AI agent checks upcoming season news for shows/anime sent from the frontend
-router.post("/:sessionId/season-news", async (req, res) => {
+router.post("/season-news", authMiddleware, async (req, res) => {
   try {
     const seriesList = req.body.shows || [];
 

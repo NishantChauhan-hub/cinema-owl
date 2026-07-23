@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Search, X, Bookmark, Activity } from "lucide-react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
+import { Search, X, Bookmark, Activity, Moon, Sun, User as UserIcon } from "lucide-react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { TABS } from "./constants";
-import { apiFetch, SESSION_ID } from "./utils";
+import { apiFetch } from "./utils";
+import { AuthContext } from "./context/AuthContext";
 
 // Pages
 import BrowsePage  from "./pages/BrowsePage";
 import DetailPage  from "./pages/DetailPage";
 import GenrePage   from "./pages/GenrePage";
 import WatchedPage from "./pages/WatchedPage";
+import AuthPage    from "./pages/AuthPage";
 
 // Components
 import Footer     from "./components/Footer";
@@ -34,25 +37,50 @@ export default function App() {
   const [query,         setQuery]         = useState("");
   const [chatOpen,      setChatOpen]      = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState(null);
+  const [theme,         setTheme]         = useState(localStorage.getItem("theme") || "dark");
+  const [toast,         setToast]         = useState(null);
+
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   // My List — stored as a Map for O(1) lookups
   const [listMap, setListMap] = useState(new Map());
   const listIds  = useMemo(() => new Set(listMap.keys()),       [listMap]);
   const listData = useMemo(() => Array.from(listMap.values()), [listMap]);
 
-  // Load My List from backend on first mount
+  // Load My List from backend when user logs in
   useEffect(() => {
-    apiFetch(`/watched/${SESSION_ID}`).then(data => {
-      if (data?.watched) {
-        const m = new Map();
-        data.watched.forEach(w => m.set(w.title_id, w));
-        setListMap(m);
-      }
-    });
-  }, []);
+    if (user) {
+      apiFetch(`/watched`).then(data => {
+        if (data?.watched) {
+          const m = new Map();
+          data.watched.forEach(w => m.set(w.title_id, w));
+          setListMap(m);
+        }
+      });
+    } else {
+      setListMap(new Map());
+    }
+  }, [user]);
+
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }
 
   // ── List management ──────────────────────────────────────────────────────────
   function toggleList(item) {
+    if (!user) {
+      showToast("Login required to save shows!");
+      return;
+    }
+
     const alreadyIn = listIds.has(item.id);
 
     if (alreadyIn) {
@@ -61,7 +89,7 @@ export default function App() {
       apiFetch("/watched", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: SESSION_ID, titleId: item.id }),
+        body: JSON.stringify({ titleId: item.id }),
       });
     } else {
       // Optimistic add
@@ -77,7 +105,6 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId: SESSION_ID,
           titleId:   item.id,
           titleType: item.type,
           titleName: item.title,
@@ -91,25 +118,25 @@ export default function App() {
   // ── Navigation helpers ───────────────────────────────────────────────────────
   function openDetail(item) {
     setView({ page: "detail", item });
-    setActivePage("browse");
+    navigate("/");
     window.scrollTo(0, 0);
   }
 
   function backToBrowse() {
     setView({ page: "browse", item: null });
+    navigate("/");
   }
 
   function navigateToGenre(id, name, type) {
     setGenreState({ id, name, type });
-    setActivePage("genre");
-    setView({ page: "browse", item: null });
+    navigate("/genre");
     window.scrollTo(0, 0);
   }
 
   function switchTab(tabId) {
     setActiveTab(tabId);
     setView({ page: "browse", item: null });
-    setActivePage("browse");
+    navigate("/");
     setQuery("");
   }
 
@@ -142,8 +169,11 @@ export default function App() {
 
           {/* My List tab */}
           <button
-            className={`nav-tab ${activePage === "mylist" ? "nav-tab-active" : ""}`}
-            onClick={() => setActivePage("mylist")}
+            className={`nav-tab ${location.pathname === "/mylist" ? "nav-tab-active" : ""}`}
+            onClick={() => {
+              if (!user) { showToast("Login required to view your list!"); navigate("/login"); return; }
+              navigate("/mylist");
+            }}
           >
             <Bookmark size={13} />
             My List
@@ -155,8 +185,22 @@ export default function App() {
           </button>
 
           <div style={{ flex: 1 }} />
+          
+          <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="icon-btn" style={{ flexShrink: 0, border: "1px solid var(--border)", background: "var(--panel)" }}>
+            {theme === "dark" ? <Sun size={14} color="var(--text-muted)" /> : <Moon size={14} color="var(--text-muted)" />}
+          </button>
+          
+          {user ? (
+            <button onClick={() => { logout(); navigate("/"); }} className="nav-tab" style={{ background: "rgba(255,0,110,0.1)", color: "var(--magenta)" }}>
+              Logout
+            </button>
+          ) : (
+            <button onClick={() => navigate("/login")} className="nav-tab" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+              <UserIcon size={13} /> Login
+            </button>
+          )}
 
-          <div className="ai-badge" style={{ flexShrink: 0 }}><Activity size={9} /> GEMINI</div>
+          <div className="ai-badge" style={{ flexShrink: 0, marginLeft: 8 }}><Activity size={9} /> GEMINI</div>
 
           {/* Search */}
           <div className="search-wrap" style={{ width: 200 }}>
@@ -181,45 +225,60 @@ export default function App() {
 
       {/* ── Main content ────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 20px 0" }}>
-
-        {activePage === "mylist" && (
-          <WatchedPage listData={listData} onToggleList={toggleList} onOpen={openDetail} />
+        {toast && (
+          <div className="fade-up" style={{ position: "fixed", top: 80, left: "50%", transform: "translateX(-50%)", zIndex: 100, background: "rgba(255,0,110,0.1)", color: "var(--magenta)", border: "1px solid rgba(255,0,110,0.3)", padding: "10px 20px", borderRadius: 99, fontWeight: 600, fontSize: 13, backdropFilter: "blur(10px)" }}>
+            {toast}
+          </div>
         )}
 
-        {activePage === "genre" && genreState && (
-          <GenrePage
-            genreId={genreState.id} genreName={genreState.name} kind={genreState.type}
-            onOpen={openDetail} inList={listIds} onToggleList={toggleList}
-            onBack={() => setActivePage("browse")}
-          />
-        )}
-
-        {activePage === "browse" && !isDetailPage && (
-          <BrowsePage
-            activeTab={activeTab} onOpen={openDetail}
-            inList={listIds} onToggleList={toggleList}
-            query={query} onOpenChat={() => setChatOpen(true)}
-            onGenreClick={navigateToGenre}
-          />
-        )}
-
-        {isDetailPage && (
-          <DetailPage
-            item={view.item} onBack={backToBrowse}
-            inList={listIds} onToggleList={toggleList}
-            onAskOwl={prompt => { setPendingPrompt(prompt); setChatOpen(true); }}
-            onGenreClick={navigateToGenre}
-          />
-        )}
+        <Routes>
+          <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
+          
+          <Route path="/mylist" element={
+            <WatchedPage listData={listData} onToggleList={toggleList} onOpen={openDetail} />
+          } />
+          
+          <Route path="/genre" element={
+            genreState ? (
+              <GenrePage
+                genreId={genreState.id} genreName={genreState.name} kind={genreState.type}
+                onOpen={openDetail} inList={listIds} onToggleList={toggleList}
+                onBack={backToBrowse}
+              />
+            ) : (
+              <div onClick={backToBrowse} style={{ cursor: "pointer" }}>Genre not found. Go back.</div>
+            )
+          } />
+          
+          <Route path="/" element={
+            view.item && view.page === "detail" ? (
+              <DetailPage
+                item={view.item} onBack={backToBrowse}
+                inList={listIds} onToggleList={toggleList}
+                onAskOwl={prompt => { setPendingPrompt(prompt); setChatOpen(true); }}
+                onGenreClick={navigateToGenre}
+              />
+            ) : (
+              <BrowsePage
+                activeTab={activeTab} onOpen={openDetail}
+                inList={listIds} onToggleList={toggleList}
+                query={query} onOpenChat={() => setChatOpen(true)}
+                onGenreClick={navigateToGenre}
+              />
+            )
+          } />
+        </Routes>
       </div>
 
-      {/* ── Footer (hidden on detail page) ──────────────────────────────────── */}
-      {!isDetailPage && <Footer onGenreClick={navigateToGenre} />}
+      {/* ── Footer (hidden on detail page or auth page) ──────────────────────────────────── */}
+      {view.page !== "detail" && location.pathname !== "/login" && location.pathname !== "/signup" && <Footer onGenreClick={navigateToGenre} />}
 
       {/* ── Chat widget ─────────────────────────────────────────────────────── */}
       <ChatWidget
         open={chatOpen} setOpen={setChatOpen}
         pendingPrompt={pendingPrompt} setPendingPrompt={setPendingPrompt}
+        listData={listData}
       />
     </div>
   );

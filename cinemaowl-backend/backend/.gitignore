@@ -10,3 +10,5 @@ db/cinemaowl.json
 
 # Logs
 *.log
+
+.vercel

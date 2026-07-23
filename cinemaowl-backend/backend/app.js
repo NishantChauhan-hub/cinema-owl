@@ -2,9 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+const connectDB = require("./db/mongoose");
+connectDB(); // Connect to MongoDB
+
 const titlesRouter = require("./routes/titles");
 const chatRouter   = require("./routes/chat");
 const watchedRouter = require("./routes/watched");
+const authRouter = require("./routes/auth");
 
 const app = express();
 
@@ -30,6 +34,7 @@ app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "CinemaOwl API" }));
 
+app.use("/api/auth",    authRouter);
 app.use("/api/titles",  titlesRouter);
 app.use("/api/chat",    chatRouter);
 app.use("/api/watched", watchedRouter);

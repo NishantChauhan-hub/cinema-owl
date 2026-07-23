@@ -36,6 +36,27 @@ a { text-decoration: none; color: inherit; }
   --r-xl: 28px;
 }
 
+[data-theme="light"] {
+  --void:    #F8F9FA;
+  --deep:    #E9ECEF;
+  --surface: #FFFFFF;
+  --panel:   #F1F3F5;
+
+  --border:        rgba(124, 58, 237, 0.15);
+  --border-bright: rgba(0, 212, 255, 0.25);
+
+  --violet:       #7C3AED;
+  --violet-glow:  rgba(124, 58, 237, 0.15);
+  --cyan:         #00B4D8;
+  --cyan-glow:    rgba(0, 180, 216, 0.15);
+  --magenta:      #FF006E;
+  --magenta-glow: rgba(255, 0, 110, 0.15);
+
+  --text:       #212529;
+  --text-muted: #495057;
+  --text-dim:   #868E96;
+}
+
 /* ── Base ───────────────────────────────────────────────────────────────────── */
 html, body, #root {
   min-height: 100vh;
@@ -138,7 +159,7 @@ html, body, #root {
 .nav-arrow:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0, 212, 255, 0.07); }
 
 /* ── Hero section ───────────────────────────────────────────────────────────── */
-.hero         { border-radius: var(--r-xl); border: 1px solid var(--border); overflow: hidden; position: relative; background: linear-gradient(135deg, #0D0520 0%, #0D1520 50%, #050D1A 100%); margin-bottom: 36px; }
+.hero         { border-radius: var(--r-xl); border: 1px solid var(--border); overflow: hidden; position: relative; background: linear-gradient(135deg, var(--panel) 0%, var(--surface) 100%); margin-bottom: 36px; }
 .hero-grid    { position: absolute; inset: 0; z-index: 1; background-image: linear-gradient(rgba(124, 58, 237, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.07) 1px, transparent 1px); background-size: 42px 42px; }
 .hero-g1      { position: absolute; width: 340px; height: 340px; border-radius: 99px; top: -100px; right: -70px; z-index: 1; background: radial-gradient(circle, rgba(124, 58, 237, 0.28), transparent 65%); filter: blur(30px); animation: float 6s ease-in-out infinite; }
 .hero-g2      { position: absolute; width: 240px; height: 240px; border-radius: 99px; bottom: -80px; left: 32%; z-index: 1; background: radial-gradient(circle, rgba(0, 212, 255, 0.18), transparent 65%); filter: blur(24px); }
