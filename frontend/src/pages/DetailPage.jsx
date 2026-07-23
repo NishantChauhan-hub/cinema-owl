@@ -72,7 +72,7 @@ export default function DetailPage({ item, onBack, inList, onToggleList, onAskOw
     <div className="fade-up">
       <button className="back-btn" onClick={onBack}><ChevronLeft size={14} /> back to browse</button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,230px) 1fr", gap: 28, alignItems: "start" }}>
+      <div className="detail-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0,230px) 1fr", gap: 28, alignItems: "start" }}>
 
         {/* ── Left: poster + list button ─────────────────────────────────────── */}
         <div>

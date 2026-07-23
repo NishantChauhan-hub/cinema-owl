@@ -120,7 +120,7 @@ export default function App() {
 
       {/* ── Topbar ──────────────────────────────────────────────────────────── */}
       <div className="topbar">
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "10px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="topbar-inner" style={{ maxWidth: 1200, margin: "0 auto", padding: "10px 20px", display: "flex", alignItems: "center", gap: 12 }}>
 
           {/* Brand / logo — clicking goes home */}
           <div className="brand" onClick={() => { backToBrowse(); setActivePage("browse"); }}>
@@ -128,7 +128,7 @@ export default function App() {
           </div>
 
           {/* Content type tabs (Movies, Shows, Anime) */}
-          <div style={{ display: "flex", gap: 2, marginLeft: 6 }}>
+          <div className="nav-tabs-container" style={{ display: "flex", gap: 2, marginLeft: 6 }}>
             {TABS.map(tab => (
               <button
                 key={tab.id}

@@ -269,3 +269,55 @@ footer         { border-top: 1px solid var(--border); background: var(--deep); m
 .genre-tags     { display: flex; flex-wrap: wrap; gap: 6px; }
 .genre-tag-pill { font-size: 11px; color: var(--text-dim); background: rgba(124, 58, 237, 0.08); border: 1px solid var(--border); padding: 4px 10px; border-radius: 99px; transition: all 0.15s; cursor: pointer; }
 .genre-tag-pill:hover { color: var(--text-muted); border-color: rgba(124, 58, 237, 0.35); }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .topbar-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .search-wrap {
+    width: 100% !important;
+    order: 4;
+    margin-top: 8px;
+  }
+  .nav-tabs-container {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-tabs-container::-webkit-scrollbar {
+    display: none;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .detail-poster {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .hero-content {
+    padding: 30px 20px;
+  }
+  .chat-panel {
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+    border: none;
+  }
+  .chat-fab {
+    bottom: 20px;
+    right: 20px;
+  }
+  .hero-title {
+    font-size: 24px;
+  }
+  .season-item {
+    flex-direction: column;
+  }
+}
