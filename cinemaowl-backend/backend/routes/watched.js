@@ -128,7 +128,8 @@ Respond in JSON format like this:
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return res.status(500).json({ error: "AI could not parse news data" });
+      console.error("AI returned non-JSON:", text);
+      return res.status(500).json({ error: `AI could not parse news data. Raw output: ${text.slice(0, 100)}` });
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
