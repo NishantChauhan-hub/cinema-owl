@@ -79,7 +79,11 @@ export default function WatchedPage({ listData, onToggleList, onOpen }) {
     setNewsLoading(true);
     setNews(null);
     setNewsError(null);
-    const data = await apiFetch(`/watched/${SESSION_ID}/season-news`);
+    const data = await apiFetch(`/watched/${SESSION_ID}/season-news`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ shows }),
+    });
     if (!data || data.error) {
       setNewsError(data?.error || data?.detail || "Could not fetch news. Is the backend running?");
     } else {

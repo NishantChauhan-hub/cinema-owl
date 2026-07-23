@@ -27,7 +27,6 @@ function fresh() {
   return {
     sessions:       {},          // { [sessionId]: true }
     messages:       [],          // { id, session_id, role, content, context_title_id, created_at }
-    saved_titles:   [],          // { session_id, title_id, title_type, created_at }
     watched_titles: [],          // { session_id, title_id, title_type, title_name, poster_url, tmdb_id, added_at }
   };
 }
@@ -74,34 +73,7 @@ function getHistory(sessionId, limit = 30) {
     .map(m => ({ role: m.role, content: m.content, created_at: m.created_at }));
 }
 
-/* ── Saved Titles ─────────────────────────────────────────────────────────── */
 
-function saveTitle(sessionId, titleId, titleType) {
-  ensureSession(sessionId);
-  const db = load();
-  const exists = db.saved_titles.some(
-    s => s.session_id === sessionId && s.title_id === titleId
-  );
-  if (!exists) {
-    db.saved_titles.push({ session_id: sessionId, title_id: titleId, title_type: titleType, created_at: now() });
-    save(db);
-  }
-}
-
-function unsaveTitle(sessionId, titleId) {
-  const db = load();
-  db.saved_titles = db.saved_titles.filter(
-    s => !(s.session_id === sessionId && s.title_id === titleId)
-  );
-  save(db);
-}
-
-function getSavedTitles(sessionId) {
-  const db = load();
-  return db.saved_titles
-    .filter(s => s.session_id === sessionId)
-    .map(s => ({ title_id: s.title_id, title_type: s.title_type }));
-}
 
 /* ── Watched Titles ───────────────────────────────────────────────────────── */
 
@@ -152,9 +124,6 @@ module.exports = {
   ensureSession,
   saveMessage,
   getHistory,
-  saveTitle,
-  unsaveTitle,
-  getSavedTitles,
   addWatched,
   removeWatched,
   getWatched,

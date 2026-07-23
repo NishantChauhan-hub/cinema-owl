@@ -4,7 +4,6 @@ const cors = require("cors");
 
 const titlesRouter = require("./routes/titles");
 const chatRouter   = require("./routes/chat");
-const savedRouter  = require("./routes/saved");
 const watchedRouter = require("./routes/watched");
 
 const app = express();
@@ -33,7 +32,6 @@ app.get("/api/health", (req, res) => res.json({ ok: true, service: "CinemaOwl AP
 
 app.use("/api/titles",  titlesRouter);
 app.use("/api/chat",    chatRouter);
-app.use("/api/saved",   savedRouter);
 app.use("/api/watched", watchedRouter);
 
 module.exports = app;

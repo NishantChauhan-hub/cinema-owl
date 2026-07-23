@@ -45,17 +45,11 @@ router.delete("/", (req, res) => {
   }
 });
 
-// ─── GET /api/watched/:sessionId/season-news ──────────────────────────────────
-// AI agent checks upcoming season news for all shows/anime in the watched list
-router.get("/:sessionId/season-news", async (req, res) => {
+// ─── POST /api/watched/:sessionId/season-news ──────────────────────────────────
+// AI agent checks upcoming season news for shows/anime sent from the frontend
+router.post("/:sessionId/season-news", async (req, res) => {
   try {
-    const list = getWatched(req.params.sessionId);
-    if (!list.length) {
-      return res.json({ news: [], message: "Your watched list is empty. Add some shows or anime first!" });
-    }
-
-    // Filter to shows and anime (movies don't have seasons)
-    const seriesList = list.filter((t) => t.title_type === "show" || t.title_type === "anime");
+    const seriesList = req.body.shows || [];
 
     if (!seriesList.length) {
       return res.json({
