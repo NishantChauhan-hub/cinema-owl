@@ -8,7 +8,24 @@ const savedRouter = require("./routes/saved");
 const watchedRouter = require("./routes/watched");
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      /^http:\/\/localhost(:\d+)?$/,           // local dev
+      /^https?:\/\/.*\.vercel\.app$/,          // any Vercel preview/prod URL
+      process.env.FRONTEND_URL,               // custom domain if set
+    ].filter(Boolean);
+    const ok = allowed.some((p) =>
+      typeof p === "string" ? origin === p : p.test(origin)
+    );
+    if (ok) return callback(null, true);
+    callback(new Error("CORS: origin not allowed — " + origin));
+  },
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "CinemaOwl API" }));

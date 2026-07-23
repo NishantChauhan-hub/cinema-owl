@@ -1,6 +1,6 @@
 import { Clapperboard, Tv, Ghost, TrendingUp, Sparkles, CalendarClock } from "lucide-react";
 
-export const API = "/api";
+export const API = import.meta.env.VITE_API_URL || "/api";
 export const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
 export const TABS = [
