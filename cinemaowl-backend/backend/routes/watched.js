@@ -59,7 +59,7 @@ router.post("/:sessionId/season-news", async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const titleList = seriesList.map((t) => `- ${t.title_name} (${t.title_type})`).join("\n");
 
@@ -103,7 +103,7 @@ Respond in JSON format like this:
     res.json(parsed);
   } catch (err) {
     console.error("Season news error:", err.message);
-    res.status(500).json({ error: "Failed to fetch season news from AI" });
+    res.status(500).json({ error: `AI Error: ${err.message}` });
   }
 });
 

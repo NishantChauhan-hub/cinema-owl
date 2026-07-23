@@ -16,10 +16,17 @@ export const SESSION_ID = (() => {
 export async function apiFetch(path, opts = {}) {
   try {
     const res = await fetch(`${API}${path}`, opts);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      try {
+        const errBody = await res.json();
+        return errBody || { error: `HTTP Error: ${res.status}` };
+      } catch {
+        return { error: `HTTP Error: ${res.status}` };
+      }
+    }
     return res.json();
-  } catch {
-    return null;
+  } catch (err) {
+    return { error: err.message };
   }
 }
 
