@@ -7,7 +7,10 @@
 const fs   = require("fs");
 const path = require("path");
 
-const DB_PATH = path.join(__dirname, "cinemaowl.json");
+// Vercel serverless: filesystem is read-only except /tmp
+const DB_PATH = process.env.VERCEL
+  ? "/tmp/cinemaowl.json"
+  : path.join(__dirname, "cinemaowl.json");
 
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
 
