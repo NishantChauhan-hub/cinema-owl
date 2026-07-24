@@ -2,6 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { authMiddleware } = require("../middleware/auth");
+const connectDB = require("../db/mongoose");
 
 const router = express.Router();
 
@@ -10,6 +11,7 @@ router.post("/signup", async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
   try {
+    await connectDB();
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ error: "User already exists" });
 
@@ -28,6 +30,7 @@ router.post("/login", async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
   try {
+    await connectDB();
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ error: "Invalid credentials" });
 
@@ -43,6 +46,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", authMiddleware, async (req, res) => {
   try {
+    await connectDB();
     const user = await User.findById(req.user.userId).select("-password");
     res.json(user);
   } catch (err) {

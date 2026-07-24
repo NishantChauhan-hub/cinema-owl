@@ -5,15 +5,19 @@ async function connectDB() {
 
   const uri = process.env.MONGODB_URI;
   if (!uri) {
-    console.warn("WARNING: MONGODB_URI environment variable is missing.");
-    return;
+    throw new Error("MONGODB_URI environment variable is missing.");
   }
 
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, {
+      bufferCommands: false,        // don't queue queries — fail fast
+      serverSelectionTimeoutMS: 8000, // give up finding a server after 8s
+      connectTimeoutMS: 8000,
+    });
     console.log("Connected to MongoDB");
   } catch (err) {
-    console.error("MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err.message);
+    throw err; // re-throw so callers know the connection failed
   }
 }
 
