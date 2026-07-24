@@ -34,27 +34,37 @@ a { text-decoration: none; color: inherit; }
   --r:    14px;
   --r-lg: 20px;
   --r-xl: 28px;
+  
+  --topbar-bg: rgba(3, 3, 8, 0.88);
+  --overlay-strong: rgba(3, 3, 8, 0.88);
+  --overlay-medium: rgba(3, 3, 8, 0.75);
+  --overlay-light: rgba(3, 3, 8, 0.4);
 }
 
 [data-theme="light"] {
-  --void:    #F8F9FA;
-  --deep:    #E9ECEF;
+  --void:    #FDFDFD;
+  --deep:    #F4F4F6;
   --surface: #FFFFFF;
-  --panel:   #F1F3F5;
+  --panel:   #F0F0F3;
 
-  --border:        rgba(124, 58, 237, 0.15);
-  --border-bright: rgba(0, 212, 255, 0.25);
+  --border:        rgba(124, 58, 237, 0.12);
+  --border-bright: rgba(0, 180, 216, 0.2);
 
   --violet:       #7C3AED;
   --violet-glow:  rgba(124, 58, 237, 0.15);
-  --cyan:         #00B4D8;
-  --cyan-glow:    rgba(0, 180, 216, 0.15);
-  --magenta:      #FF006E;
-  --magenta-glow: rgba(255, 0, 110, 0.15);
+  --cyan:         #0284C7;
+  --cyan-glow:    rgba(2, 132, 199, 0.15);
+  --magenta:      #E11D48;
+  --magenta-glow: rgba(225, 29, 72, 0.15);
 
-  --text:       #212529;
-  --text-muted: #495057;
-  --text-dim:   #868E96;
+  --text:       #111827;
+  --text-muted: #4B5563;
+  --text-dim:   #9CA3AF;
+  
+  --topbar-bg: rgba(253, 253, 253, 0.88);
+  --overlay-strong: rgba(255, 255, 255, 0.95);
+  --overlay-medium: rgba(255, 255, 255, 0.85);
+  --overlay-light: rgba(255, 255, 255, 0.6);
 }
 
 /* ── Base ───────────────────────────────────────────────────────────────────── */
@@ -98,7 +108,7 @@ html, body, #root {
 /* ── Topbar ─────────────────────────────────────────────────────────────────── */
 .topbar {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(3, 3, 8, 0.88);
+  background: var(--topbar-bg);
   backdrop-filter: blur(22px);
   border-bottom: 1px solid var(--border);
 }
@@ -138,14 +148,14 @@ html, body, #root {
 .poster-wrap        { position: relative; width: 100%; aspect-ratio: 2/3; border-radius: var(--r); overflow: hidden; border: 1px solid var(--border); }
 .poster-wrap img    { width: 100%; height: 100%; object-fit: cover; }
 .poster-grad        { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 10px; }
-.poster-overlay     { position: absolute; inset: 0; background: linear-gradient(to top, rgba(3, 3, 8, 0.88) 0%, transparent 55%); }
-.poster-year        { position: absolute; top: 8px; right: 8px; background: rgba(3, 3, 8, 0.75); backdrop-filter: blur(6px); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 99px; }
+.poster-overlay     { position: absolute; inset: 0; background: linear-gradient(to top, var(--overlay-strong) 0%, transparent 55%); }
+.poster-year        { position: absolute; top: 8px; right: 8px; background: var(--overlay-medium); backdrop-filter: blur(6px); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 99px; }
 
-.card-hover-overlay { position: absolute; inset: 0; border-radius: var(--r); display: flex; align-items: center; justify-content: center; background: rgba(3, 3, 8, 0.4); backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.18s; }
+.card-hover-overlay { position: absolute; inset: 0; border-radius: var(--r); display: flex; align-items: center; justify-content: center; background: var(--overlay-light); backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.18s; }
 .media-card:hover .card-hover-overlay { opacity: 1; }
 
 .play-circle  { width: 44px; height: 44px; border-radius: 99px; background: rgba(255, 255, 255, 0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
-.card-add-btn { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; border-radius: 99px; background: rgba(3, 3, 8, 0.75); backdrop-filter: blur(6px); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+.card-add-btn { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; border-radius: 99px; background: var(--overlay-medium); backdrop-filter: blur(6px); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
 .card-add-btn:hover, .card-add-btn.active { border-color: var(--cyan); background: rgba(0, 212, 255, 0.12); }
 
 .card-meta    { margin-top: 7px; padding: 0 2px; display: flex; align-items: center; gap: 6px; }
