@@ -60,8 +60,8 @@ export default function MediaCard({ item, onOpen, inList, onToggleList }) {
           title={inList ? "Remove from My List" : "Add to My List"}
         >
           {inList
-            ? <BookmarkCheck size={13} color="#00D4FF" />
-            : <Bookmark size={13} color="rgba(232,232,255,0.6)" />}
+            ? <BookmarkCheck size={13} color="var(--cyan)" />
+            : <Bookmark size={13} color="var(--text-muted)" />}
         </button>
       </div>
 

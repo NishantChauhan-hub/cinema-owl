@@ -42,26 +42,26 @@ a { text-decoration: none; color: inherit; }
 }
 
 [data-theme="light"] {
-  --void:    #F8FAFC;
-  --deep:    #F1F5F9;
+  --void:    #F3F0FF;
+  --deep:    #EAE4FF;
   --surface: #FFFFFF;
-  --panel:   #F1F5F9;
+  --panel:   #EAE4FF;
 
-  --border:        #E2E8F0;
-  --border-bright: #CBD5E1;
+  --border:        #D6C8FF;
+  --border-bright: #BFA8FF;
 
-  --violet:       #6366F1;
-  --violet-glow:  rgba(99, 102, 241, 0.15);
-  --cyan:         #0EA5E9;
-  --cyan-glow:    rgba(14, 165, 233, 0.15);
-  --magenta:      #F43F5E;
-  --magenta-glow: rgba(244, 63, 94, 0.15);
+  --violet:       #6D28D9;
+  --violet-glow:  rgba(109, 40, 217, 0.15);
+  --cyan:         #0284C7;
+  --cyan-glow:    rgba(2, 132, 199, 0.15);
+  --magenta:      #E11D48;
+  --magenta-glow: rgba(225, 29, 72, 0.15);
 
-  --text:       #0F172A;
-  --text-muted: #475569;
-  --text-dim:   #94A3B8;
+  --text:       #2E1065;
+  --text-muted: #5B21B6;
+  --text-dim:   #8B5CF6;
   
-  --topbar-bg: rgba(255, 255, 255, 0.85);
+  --topbar-bg: rgba(243, 240, 255, 0.85);
   --overlay-strong: rgba(255, 255, 255, 0.95);
   --overlay-medium: rgba(255, 255, 255, 0.85);
   --overlay-light: rgba(255, 255, 255, 0.6);
@@ -148,7 +148,7 @@ html, body, #root {
 .poster-wrap        { position: relative; width: 100%; aspect-ratio: 2/3; border-radius: var(--r); overflow: hidden; border: 1px solid var(--border); }
 .poster-wrap img    { width: 100%; height: 100%; object-fit: cover; }
 .poster-grad        { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 10px; }
-.poster-overlay     { position: absolute; inset: 0; background: linear-gradient(to top, var(--overlay-strong) 0%, transparent 20%); }
+.poster-overlay     { display: none; }
 .poster-year        { position: absolute; top: 8px; right: 8px; background: var(--overlay-medium); backdrop-filter: blur(6px); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 99px; }
 
 .card-hover-overlay { position: absolute; inset: 0; border-radius: var(--r); display: flex; align-items: center; justify-content: center; background: var(--overlay-light); backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.18s; }
