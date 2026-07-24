@@ -19,7 +19,7 @@ router.post("/signup", async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || "fallback_secret", { expiresIn: "30d" });
     res.json({ token, email: user.email });
   } catch (err) {
-    res.status(500).json({ error: "Server error during signup" });
+    res.status(500).json({ error: "Server error during signup: " + err.message });
   }
 });
 
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || "fallback_secret", { expiresIn: "30d" });
     res.json({ token, email: user.email });
   } catch (err) {
-    res.status(500).json({ error: "Server error during login" });
+    res.status(500).json({ error: "Server error during login: " + err.message });
   }
 });
 
